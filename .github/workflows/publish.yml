@@ -1,0 +1,30 @@
+name: Publish @distube/ytpl
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  publish:
+    name: Build & Publish
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Lint
+        run: npm i && npm run lint
+
+      - name: Publish
+        run: npm publish
+
+      - name: Deprecate older versions
+        run: npm deprecate @distube/ytpl@"< ${{ github.ref_name }}" "This version is deprecated, please upgrade to the latest version."
